@@ -1,0 +1,39 @@
+<div class="flex flex-col h-screen bg-gray-100">
+<!--stop -->
+
+
+    <!-- Main content -->
+    <main class="flex-1 p-6 bg-gray-200 relative">
+        <!-- Modal overlay -->
+        <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <!-- Modal content -->
+            <div class="bg-white rounded-lg shadow-xl p-6 w-96">
+                <h2 class="text-2xl font-bold mb-4">Add some panoramas</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Drag and drop files here or anywhere else on the window
+                    </p>
+                </div>
+                <div class="bg-blue-100 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h3 class="font-bold mb-2">File requirements</h3>
+                    <ul class="text-sm list-disc list-inside">
+                        <li>Sphere (equirectangular) or cube faces</li>
+                        <li>Equirectangular aspect ratio 2:1</li>
+                        <li>Cube filename suffixes: b, d, f, l, r, u</li>
+                        <li>JPEG or TIFF</li>
+                        <li>Maximum sphere size 23000x11500px</li>
+                        <li>Maximum cube size 16000x16000px</li>
+                    </ul>
+                </div>
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" multiple
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    style="cursor: pointer;">
+
+            </div>
+        </div>
+    </main>
+</div>
