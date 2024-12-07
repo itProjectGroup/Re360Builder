@@ -22,5 +22,7 @@
   <!-- Main content area with panorama viewer -->
   <div class="flex-1 relative bg-black">
     <div #panoViewer class="absolute inset-0 w-full h-full"></div>
+    <input type="checkbox" (change)="toggleAutorotate($event)" id="autorotateToggle">
+    <label for="autorotateToggle">Auto-rotate</label>
   </div>
 </div>

@@ -6,7 +6,8 @@ import { AppComponent } from './app.component';
 import { TourCreatorComponent } from './tour-creator/tour-creator.component';
 import { BuilderDashboardComponent } from './builder-dashboard/builder-dashboard.component'
 import { PanoramaService } from './services/panorama.service';
-
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent,
@@ -14,8 +15,10 @@ import { PanoramaService } from './services/panorama.service';
     BuilderDashboardComponent
   ],
   imports: [
+    FormsModule,
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    MatCheckboxModule
   ],
   providers: [PanoramaService],
   bootstrap: [AppComponent]

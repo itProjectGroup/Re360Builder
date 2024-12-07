@@ -13,6 +13,8 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('panoViewer') panoViewer!: ElementRef;
   viewer?: any;
   private pendingPanorama?: PanoramaImage;
+  private autorotate: boolean = false;
+  autorotateConfig: any;
 
   constructor(
     private panoramaService: PanoramaService,
@@ -32,6 +34,12 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
       }
       this.cdr.detectChanges();
     });
+
+    this.autorotateConfig = (Marzipano as any).autorotate({
+      yawSpeed: 0.1,         // Yaw rotation speed
+      targetPitch: 0,        // Pitch value to converge to
+      targetFov: Math.PI/2   // Fov value to converge to
+    });
   }
 
   ngAfterViewInit() {
@@ -40,8 +48,8 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
         mouseViewMode: 'drag'
       }
     };
-    this.viewer = new Marzipano.Viewer(this.panoViewer.nativeElement, viewerOpts);
     
+    this.viewer = new Marzipano.Viewer(this.panoViewer.nativeElement, viewerOpts);
     if (this.pendingPanorama) {
       setTimeout(() => {
         this.selectPanorama(this.pendingPanorama!);
@@ -143,5 +151,15 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
     };
 
     fileInput.click();
+  }
+
+  toggleAutorotate(event: any): void {
+    this.autorotate = event.target.checked;
+
+    if (this.autorotate) {
+      this.viewer.startMovement(this.autorotateConfig); 
+    } else {
+      this.viewer.stopMovement();
+    }
   }
 }
