@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TourCreatorComponent } from './tour-creator/tour-creator.component';
 import { BuilderDashboardComponent } from './builder-dashboard/builder-dashboard.component'
+import { PanoramaService } from './services/panorama.service';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,7 @@ import { BuilderDashboardComponent } from './builder-dashboard/builder-dashboard
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [PanoramaService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

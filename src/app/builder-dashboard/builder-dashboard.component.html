@@ -1,1 +1,26 @@
-<p>builder-dashboard works!</p>
+<div class="flex h-screen">
+  <!-- Sidebar with panorama list -->
+  <div class="w-64 bg-gray-800 text-white p-4 overflow-y-auto">
+    <h2 class="text-xl font-bold mb-4">Panorama List</h2>
+    <button 
+      (click)="addMorePanoramas()" 
+      class="w-full mb-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+      Add More Images
+    </button>
+    <div class="space-y-2">
+      <div 
+        *ngFor="let panorama of panoramas; trackBy: trackByFn"
+        (click)="selectPanorama(panorama)"
+        class="cursor-pointer p-2 hover:bg-gray-700 rounded"
+        [class.bg-gray-700]="selectedPanorama?.id === panorama.id"
+      >
+        {{ panorama.name }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content area with panorama viewer -->
+  <div class="flex-1 relative bg-black">
+    <div #panoViewer class="absolute inset-0 w-full h-full"></div>
+  </div>
+</div>
