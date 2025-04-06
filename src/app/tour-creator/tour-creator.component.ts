@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PanoramaService } from '../services/panorama.service';
+import { PanoramaService } from '../services/panorama-builder/panorama.service';
 
 @Component({
   selector: 'app-tour-creator',

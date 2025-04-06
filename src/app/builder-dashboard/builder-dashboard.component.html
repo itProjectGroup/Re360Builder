@@ -7,13 +7,26 @@
       class="w-full mb-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
       Add More Images
     </button>
+    
+    <div class="mb-4 flex space-x-2">
+      <button 
+        (click)="exportHotspots()" 
+        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+        Export Hotspots
+      </button>
+      
+      <label class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded cursor-pointer">
+        Import
+        <input type="file" accept=".json" (change)="importHotspots($event)" class="hidden">
+      </label>
+    </div>
+    
     <div class="space-y-2">
       <div 
         *ngFor="let panorama of panoramas; trackBy: trackByFn"
         (click)="selectPanorama(panorama)"
         class="cursor-pointer p-2 hover:bg-gray-700 rounded"
-        [class.bg-gray-700]="selectedPanorama?.id === panorama.id"
-      >
+        [class.bg-gray-700]="selectedPanorama?.id === panorama.id">
         {{ panorama.name }}
       </div>
     </div>
@@ -22,7 +35,29 @@
   <!-- Main content area with panorama viewer -->
   <div class="flex-1 relative bg-black">
     <div #panoViewer class="absolute inset-0 w-full h-full"></div>
-    <input type="checkbox" (change)="toggleAutorotate($event)" id="autorotateToggle">
-    <label for="autorotateToggle">Auto-rotate</label>
+    
+    <div class="absolute bottom-4 right-4 bg-white rounded-lg p-2 shadow-md">
+      <label class="flex items-center space-x-2 cursor-pointer">
+        <input type="checkbox" (change)="toggleAutorotate($event)">
+        <span>Auto-rotate</span>
+      </label>
+    </div>
+    
+    <!-- Instructions panel -->
+    <div class="absolute top-4 left-4 bg-white bg-opacity-75 rounded-lg p-3 shadow-md max-w-xs">
+      <h3 class="font-bold mb-2">Instructions:</h3>
+      <p class="text-sm">Right-click anywhere on the panorama to add hotspots.</p>
+    </div>
+    
+    <!-- Context Menu -->
+    <app-context-menu
+      [visible]="contextMenuVisible"
+      [x]="contextMenuX"
+      [y]="contextMenuY"
+      (addLinkHotspot)="addLinkHotspot()"
+      (addInfoHotspot)="addInfoHotspot()"
+      (setInitialView)="setInitialView()"
+      (close)="closeContextMenu()">
+    </app-context-menu>
   </div>
 </div>

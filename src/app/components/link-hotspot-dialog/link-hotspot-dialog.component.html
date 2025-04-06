@@ -1,0 +1,45 @@
+<h2 mat-dialog-title class="dialog-title">{{ isEditing ? 'Edit' : 'Add' }} Link Hotspot</h2>
+<div mat-dialog-content class="dialog-content">
+  <p class="instruction-text">Select destination panorama:</p>
+  <mat-form-field appearance="outline" class="w-full">
+    <mat-label>Target Panorama</mat-label>
+    <mat-select [(ngModel)]="selectedTargetId" (selectionChange)="onTargetChange()">
+      <mat-option *ngFor="let panorama of data.panoramas" 
+                 [value]="panorama.id"
+                 [disabled]="panorama.id === data.currentPanoramaId">
+        {{ panorama.name }}
+        <span *ngIf="panorama.id === data.currentPanoramaId"> (Current)</span>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  
+  <div *ngIf="selectedTargetId" class="initial-view-section">
+    <p class="instruction-text">Set initial view for destination (optional):</p>
+    <div class="initial-view-controls">
+      <mat-form-field appearance="outline">
+        <mat-label>Yaw (horizontal)</mat-label>
+        <input matInput type="number" [(ngModel)]="initialViewYaw" min="-180" max="180" step="5">
+        <span matSuffix>°</span>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Pitch (vertical)</mat-label>
+        <input matInput type="number" [(ngModel)]="initialViewPitch" min="-90" max="90" step="5">
+        <span matSuffix>°</span>
+      </mat-form-field>
+    </div>
+    
+    <div class="use-current-view">
+      <button mat-stroked-button color="primary" (click)="useCurrentViewAsInitial()">
+        Use Current View
+      </button>
+      <span class="helper-text">Set the initial view to match what you currently see</span>
+    </div>
+  </div>
+</div>
+<div mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="!selectedTargetId">
+    {{ isEditing ? 'Update' : 'Add' }}
+  </button>
+</div> 

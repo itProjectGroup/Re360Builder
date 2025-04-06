@@ -1,0 +1,59 @@
+// Dialog styles
+.dialog-title {
+  color: #2c3e50;
+  font-size: 24px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 16px;
+}
+
+.dialog-content {
+  padding: 0 16px;
+  
+  .instruction-text {
+    color: #5d6d7e;
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+  
+  .w-full {
+    width: 100%;
+  }
+}
+
+.dialog-actions {
+  padding: 16px;
+  margin-top: 16px;
+  border-top: 1px solid #eaeaea;
+}
+
+mat-form-field {
+  margin-bottom: 16px;
+}
+
+.initial-view-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px dashed #eaeaea;
+}
+
+.initial-view-controls {
+  display: flex;
+  gap: 16px;
+  
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.use-current-view {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  
+  .helper-text {
+    margin-left: 12px;
+    font-size: 14px;
+    color: #5d6d7e;
+  }
+} 

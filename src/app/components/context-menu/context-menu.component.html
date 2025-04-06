@@ -1,0 +1,18 @@
+<div 
+  *ngIf="visible" 
+  class="context-menu" 
+  [style.left.px]="x" 
+  [style.top.px]="y">
+  <div class="menu-item" (click)="onAddLinkHotspot()">
+    <img src="./assets/img/link.png" alt="Link" class="menu-icon">
+    <span>Add Link Hotspot</span>
+  </div>
+  <div class="menu-item" (click)="onAddInfoHotspot()">
+    <img src="./assets/img/info.png" alt="Info" class="menu-icon">
+    <span>Add Info Hotspot</span>
+  </div>
+  <div class="menu-item" (click)="onSetInitialView()">
+    <img src="./assets/img/view.png" alt="View" class="menu-icon">
+    <span>Set Initial View</span>
+  </div>
+</div> 
