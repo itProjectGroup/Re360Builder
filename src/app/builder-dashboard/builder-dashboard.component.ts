@@ -204,22 +204,86 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
   // Handle hotspot click - switch to target panorama
   onHotspotClick(targetId: string): void {
     const targetPanorama = this.panoramas.find(p => p.id === targetId);
-    if (!targetPanorama) return;
+    if (!targetPanorama || !this.viewer) return;
     
     // Find the hotspot that links to this target to get initial view settings
     const currentSceneHotspots = this.hotspotInfoService.getHotspotsForScene(this.selectedPanorama?.id || '');
     const linkHotspot = currentSceneHotspots.find(h => h.type === 'link' && h.target === targetId);
     
-    this.selectPanorama(targetPanorama);
+    // Instead of calling selectPanorama(), we'll handle the transition here
+    this.selectedPanorama = targetPanorama;
     
-    // Apply initial view if specified
-    if (linkHotspot?.targetInitialView && this.viewer) {
+    const image = new Image();
+    image.src = targetPanorama.url;
+    
+    image.onload = () => {
+      // Create the geometry and source for the new scene
+      const source = Marzipano.ImageUrlSource.fromString(targetPanorama.url);
+      const geometry = new Marzipano.EquirectGeometry([{
+        width: image.width,
+        height: image.height,
+        tileWidth: image.width,
+        tileHeight: image.height
+      }]);
+      
+      // Create view with initial parameters
+      const limiter = Marzipano.RectilinearView.limit.traditional(4096, 100 * Math.PI / 180);
+      
+      // Set initial view based on hotspot target or panorama default
+      let viewOptions = null;
+      if (linkHotspot?.targetInitialView) {
+        viewOptions = {
+          yaw: linkHotspot.targetInitialView.yaw,
+          pitch: linkHotspot.targetInitialView.pitch
+        };
+      } else if (targetPanorama.initialView) {
+        viewOptions = {
+          yaw: targetPanorama.initialView.yaw,
+          pitch: targetPanorama.initialView.pitch
+        };
+      }
+      
+      const view = new Marzipano.RectilinearView(viewOptions, limiter);
+      
+      // Create the new scene
+      const newScene = this.viewer.createScene({
+        source: source,
+        geometry: geometry,
+        view: view,
+        pinFirstLevel: true
+      });
+      
+      // Define transition effect
+      const transitionDuration = 1000;  // 1 second transition
+      
+      // Choose a transition effect - can be 'crossFade', 'fadeIn', 'fadeOut', etc.
+      const transitionEffect = { 
+        transitionDuration: transitionDuration,
+        transitionUpdate: (value: number, newScene: any, oldScene: any) => {
+          // Fade out the old scene and fade in the new scene
+          newScene.layer().setEffects({ opacity: value });
+          if (oldScene) {
+            oldScene.layer().setEffects({ opacity: 1 - value });
+          }
+        }
+      };
+      
+      // Switch to the new scene with transition
+      newScene.switchTo(transitionEffect);
+      
+      // Update current scene reference
+      this.currentScene = newScene;
+      
+      // Load hotspots for the new scene after transition
       setTimeout(() => {
-        const view = this.viewer.view();
-        view.setYaw(linkHotspot.targetInitialView!.yaw);
-        view.setPitch(linkHotspot.targetInitialView!.pitch);
-      }, 100);
-    }
+        this.loadHotspotsForScene(targetPanorama.id);
+      }, transitionDuration); 
+    };
+    
+    image.onerror = (error) => {
+      console.error('Error loading panorama image:', error);
+      this.messageService.error('Failed to load panorama');
+    };
   }
 
   // Handle right-click to open context menu
