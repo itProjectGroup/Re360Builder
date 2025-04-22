@@ -2,63 +2,150 @@
   position: absolute;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  min-width: 200px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  min-width: 220px;
   z-index: 1000;
   overflow: hidden;
+  padding: 8px 0;
+  animation: fadeIn 0.2s ease-out;
+  
+  .menu-title {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    margin-bottom: 4px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
   
   .menu-item {
     padding: 12px 16px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    color: #333;
     
     &:hover {
       background-color: #f0f8ff;
+      color: #1976d2;
     }
     
     .menu-icon {
       width: 20px;
       height: 20px;
-      margin-right: 12px;
-      filter: invert(40%);
+      margin-right: 16px;
+      opacity: 0.7;
+    }
+    
+    .menu-text {
+      font-size: 14px;
+      font-weight: 400;
+    }
+    
+    &.danger {
+      color: #f44336;
+      
+      &:hover {
+        background-color: #ffebee;
+      }
     }
   }
+  
+  .menu-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 8px 0;
+  }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Adding a pulse animation for the icon on hover */
+.menu-item:hover .menu-icon {
+  animation: pulse 1s infinite;
+  opacity: 1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Hotspot Context Menu - Clean Minimal Design */
 .hotspot-context-menu {
   position: absolute;
-  right: -10px;
-  top: -60px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 130px;
+  overflow: hidden;
   z-index: 1001;
-  display: flex;
-  flex-direction: column;
+  animation: fadeIn 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  
+  /* Position it more intuitively */
+  left: calc(100% + 8px); /* Place to the right of hotspot */
+  top: 50%;
+  transform: translateY(-50%);
+  
+  /* Buttons with hover effects */
+  .hotspot-button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    border: none;
+    background-color: transparent;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+    
+    &:hover {
+      background-color: #f5f9ff;
+      color: #2196F3;
+    }
+    
+    /* Make sure delete button is red */
+    &:last-child {
+      color: #f44336;
+      
+      &:hover {
+        background-color: #fff5f5;
+      }
+    }
+  }
+  
+  /* Add elegant divider */
+  .hotspot-button:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+  }
 }
 
-.hotspot-button {
-  padding: 8px 16px;
-  margin: 4px 0;
-  background-color: #f0f8ff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: #e1f0ff;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-5px);
   }
-
-  &:first-child {
-    margin-top: 0;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
   }
 } 

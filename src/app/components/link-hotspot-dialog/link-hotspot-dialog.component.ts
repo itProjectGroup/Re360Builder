@@ -80,4 +80,25 @@ export class LinkHotspotDialogComponent implements OnInit {
     
     this.dialogRef.close(hotspot);
   }
+
+  setPresetView(yaw: number, pitch: number): void {
+    this.initialViewYaw = yaw;
+    this.initialViewPitch = pitch;
+  }
+
+  useTargetInitialView(): void {
+    if (!this.selectedTargetId) return;
+    
+    // Find the selected panorama
+    const targetPanorama = this.data.panoramas.find(p => p.id === this.selectedTargetId);
+    
+    // If it has an initialView, use it
+    if (targetPanorama?.initialView) {
+      this.initialViewYaw = targetPanorama.initialView.yaw;
+      this.initialViewPitch = targetPanorama.initialView.pitch;
+    } else {
+      // If no initial view exists for the target, show a message
+      alert('No initial view has been set for this panorama.');
+    }
+  }
 } 

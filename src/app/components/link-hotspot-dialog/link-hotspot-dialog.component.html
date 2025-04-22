@@ -3,37 +3,47 @@
   <p class="instruction-text">Select destination panorama:</p>
   <mat-form-field appearance="outline" class="w-full">
     <mat-label>Target Panorama</mat-label>
-    <mat-select [(ngModel)]="selectedTargetId" (selectionChange)="onTargetChange()">
-      <mat-option *ngFor="let panorama of data.panoramas" 
+    <select [(ngModel)]="selectedTargetId" (selectionChange)="onTargetChange()">
+      <option *ngFor="let panorama of data.panoramas" 
                  [value]="panorama.id"
                  [disabled]="panorama.id === data.currentPanoramaId">
         {{ panorama.name }}
         <span *ngIf="panorama.id === data.currentPanoramaId"> (Current)</span>
-      </mat-option>
-    </mat-select>
+      </option>
+    </select>
   </mat-form-field>
   
   <div *ngIf="selectedTargetId" class="initial-view-section">
-    <p class="instruction-text">Set initial view for destination (optional):</p>
+    <p class="instruction-text">Set initial view for destination:</p>
     <div class="initial-view-controls">
       <mat-form-field appearance="outline">
-        <mat-label>Yaw (horizontal)</mat-label>
-        <input matInput type="number" [(ngModel)]="initialViewYaw" min="-180" max="180" step="5">
+        <input matInput type="number" [(ngModel)]="initialViewYaw" min="-180" max="180" step="5" placeholder="Yaw (horizontal)">
         <span matSuffix>°</span>
       </mat-form-field>
       
       <mat-form-field appearance="outline">
-        <mat-label>Pitch (vertical)</mat-label>
-        <input matInput type="number" [(ngModel)]="initialViewPitch" min="-90" max="90" step="5">
+        <input matInput type="number" [(ngModel)]="initialViewPitch" min="-90" max="90" step="5" placeholder="Pitch (vertical)">
         <span matSuffix>°</span>
       </mat-form-field>
     </div>
     
-    <div class="use-current-view">
-      <button mat-stroked-button color="primary" (click)="useCurrentViewAsInitial()">
-        Use Current View
-      </button>
-      <span class="helper-text">Set the initial view to match what you currently see</span>
+    <div class="initial-view-options">
+      <div class="view-presets">
+        <button class="preset-button" (click)="setPresetView(0, 0)">Default (0,0)</button>
+        <button class="preset-button" (click)="setPresetView(90, 0)">Right (90,0)</button>
+        <button class="preset-button" (click)="setPresetView(-90, 0)">Left (-90,0)</button>
+        <button class="preset-button" (click)="setPresetView(180, 0)">Behind (180,0)</button>
+      </div>
+      
+      <div class="view-actions">
+        <button class="view-action-button target-view" (click)="useTargetInitialView()">
+          Use Panorama's Initial View
+        </button>
+        
+        <button class="view-action-button current-view" (click)="useCurrentViewAsInitial()">
+          Use Current View
+        </button>
+      </div>
     </div>
   </div>
 </div>

@@ -34,26 +34,137 @@ mat-form-field {
 .initial-view-section {
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px dashed #eaeaea;
-}
-
-.initial-view-controls {
-  display: flex;
-  gap: 16px;
+  border-top: 1px solid #f0f0f0;
   
-  mat-form-field {
-    flex: 1;
-  }
-}
-
-.use-current-view {
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-  
-  .helper-text {
-    margin-left: 12px;
+  .instruction-text {
     font-size: 14px;
-    color: #5d6d7e;
+    color: #666;
+    margin-bottom: 16px;
+  }
+  
+  .initial-view-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+    
+    mat-form-field {
+      width: 100%;
+    }
+  }
+  
+  .view-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    
+    .preset-button {
+      padding: 6px 12px;
+      border-radius: 16px;
+      background-color: #f5f5f5;
+      color: #555;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.2s;
+      
+      &:hover {
+        background-color: #e3f2fd;
+        color: #2196F3;
+      }
+    }
+  }
+  
+  .use-current-view {
+    display: flex;
+    align-items: center;
+    
+    button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      background-color: #e3f2fd;
+      color: #2196F3;
+      border: 1px solid #bbdefb;
+      
+      &:before {
+        content: '';
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background-image: url('../../../assets/img/windowed.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+    }
+    
+    .helper-text {
+      margin-left: 12px;
+      font-size: 12px;
+      color: #777;
+    }
+  }
+  
+  .initial-view-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  
+  .view-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    .view-action-button {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:before {
+        content: '';
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+        background-size: contain;
+        background-repeat: no-repeat;
+      }
+      
+      &.target-view {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        
+        // &:before {
+        //   background-image: url('../../../assets/img/panorama.png');
+        // }
+        
+        &:hover {
+          background-color: #c8e6c9;
+        }
+      }
+      
+      &.current-view {
+        background-color: #e3f2fd;
+        color: #1976d2;
+        
+        &:before {
+          background-image: url('../../../assets/img/windowed.png');
+        }
+        
+        &:hover {
+          background-color: #bbdefb;
+        }
+      }
+    }
   }
 } 
