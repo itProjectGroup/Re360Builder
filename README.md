@@ -1,4 +1,4 @@
-# 360° Panorama Tour Builder
+# Re360 - The 360° Panorama Tour Builder
 
 Create stunning, interactive 360° panorama tours with this powerful and intuitive template. Perfect for real estate, tourism, virtual tours, and immersive experiences.
 
