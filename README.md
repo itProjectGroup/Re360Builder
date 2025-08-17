@@ -1,27 +1,71 @@
-# Re360Builder
+# 360° Panorama Tour Builder
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.3.
+Create stunning, interactive 360° panorama tours with this powerful and intuitive template. Perfect for real estate, tourism, virtual tours, and immersive experiences.
 
-## Development server
+## ✨ What You Can Do
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- **Build Immersive Tours:** Create multi-scene panorama experiences that transport viewers anywhere
+- **Easy Scene Management:** Seamlessly switch between panoramas with an intuitive sidebar
+- **Professional Export:** Generate complete, standalone tour packages ready for web deployment
+- **Modern Interface:** Enjoy a clean, responsive design that works on all devices
 
-## Code scaffolding
+## 🚀 Getting Started
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### 1. **Upload Your Panoramas**
+- Simply drag and drop your 360° images or click to browse
+- Supports both equirectangular and cube face formats
+- Automatic optimization and validation
 
-## Build
+### 2. **Customize Your Experience**
+- Add interactive hotspots between scenes
+- Set perfect starting views for each panorama
+- Organize scenes in any order you prefer
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### 3. **Export & Share**
+- One-click export creates a complete tour package
+- Includes all images, configuration, and viewer files
+- Ready to upload to any web server
 
-## Running unit tests
+## 📱 Perfect for Any Device
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+The responsive design ensures your tours look great on:
+- Desktop computers
+- Tablets
+- Mobile phones
+- VR headsets
 
-## Running end-to-end tests
+## 📋 Image Requirements
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+**Equirectangular Panoramas:**
+- 2:1 aspect ratio (width:height)
+- Maximum size: 23,000 × 11,500 pixels
+- Formats: JPEG, TIFF
 
-## Further help
+## 🎯 Use Cases
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- **Real Estate:** Virtual property tours
+- **Tourism:** Destination showcases
+- **Education:** Virtual field trips
+- **Events:** Venue previews
+- **Museums:** Exhibition tours
+- **Hotels:** Room showcases
+
+## 🔧 Technical Features
+
+- Built with modern web standards
+- Optimized for performance
+- Cross-browser compatibility
+- Touch-friendly controls
+- Keyboard navigation support
+
+## Screenshots
+
+### Add Panoramas
+![Add Panoramas UI](assets/screenshots/re360GithubImage2.png)
+
+### Viewer with Sidebar and Scene List
+![Viewer with Sidebar](assets/screenshots/re360GithubImage.png)
+
+---
+
+**Ready to create your first immersive tour? Start building today!**
