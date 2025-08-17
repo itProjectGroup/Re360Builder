@@ -67,7 +67,8 @@ export class LinkHotspotDialogComponent implements OnInit {
       type: 'link',
       yaw: this.data.yaw,
       pitch: this.data.pitch,
-      target: this.selectedTargetId
+      target: this.selectedTargetId,
+      rotation: 0
     };
     
     // Add initial view if values are set

@@ -1,7 +1,18 @@
 <div class="flex h-screen">
   <!-- Sidebar with panorama list -->
   <div class="w-64 bg-gray-800 text-white p-4 overflow-y-auto">
-    <h2 class="text-xl font-bold mb-4">Panorama List</h2>
+    <div class="flex items-center mb-4">
+      <ng-container *ngIf="!editingTitle; else editTitleBlock">
+        <h2 class="text-xl font-bold mr-2">{{ projectTitle }}</h2>
+        <button (click)="editingTitle = true" class="ml-1 p-1 bg-gray-600 hover:bg-gray-700 rounded-full text-xs flex items-center justify-center" style="width: 28px; height: 28px; min-width: 0;">
+          <mat-icon style="font-size: 15px; padding-top: 20%;">edit</mat-icon>
+        </button>
+      </ng-container>
+      <ng-template #editTitleBlock>
+        <input [(ngModel)]="projectTitle" (blur)="saveProjectTitle()" (keydown.enter)="saveProjectTitle()" class="text-black px-2 py-1 rounded border border-gray-400 w-40" autofocus />
+        <button (click)="saveProjectTitle()" class="ml-2 px-2 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm text-white">Save</button>
+      </ng-template>
+    </div>
     <button 
       (click)="addMorePanoramas()" 
       class="w-full mb-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
@@ -11,14 +22,14 @@
     <div class="mb-4 flex space-x-2">
       <button 
         (click)="exportHotspots()" 
-        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
-        Export Hotspots
+        class=" w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+        Export
       </button>
       
-      <label class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded cursor-pointer">
+      <!-- <label class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded cursor-pointer">
         Import
         <input type="file" accept=".json" (change)="importHotspots($event)" class="hidden">
-      </label>
+      </label> -->
     </div>
     
     <div class="space-y-2">
@@ -44,10 +55,23 @@
     </div>
     
     <!-- Instructions panel -->
-    <div class="absolute top-4 left-4 bg-white bg-opacity-75 rounded-lg p-3 shadow-md max-w-xs">
-      <h3 class="font-bold mb-2">Instructions:</h3>
-      <p class="text-sm">Right-click anywhere on the panorama to add hotspots.</p>
+    <div *ngIf="showInstructions" class="absolute top-4 left-4 bg-white bg-opacity-90 rounded-lg p-3 shadow-md max-w-xs z-50 flex flex-col gap-2">
+      <div class="flex justify-between items-center mb-1">
+        <h3 class="font-bold">Instructions:</h3>
+        <button (click)="closeInstructions()" class="ml-2 text-gray-500 hover:text-gray-800 text-lg font-bold leading-none px-2 py-0.5 rounded-full focus:outline-none" aria-label="Close instructions">&times;</button>
+      </div>
+      <p class="text-sm min-h-[40px]">{{ instructionSteps[currentInstructionStep] }}</p>
+      <div class="flex justify-between items-center mt-2">
+        <button (click)="prevInstructionStep()" [disabled]="currentInstructionStep === 0" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 text-xs font-semibold disabled:opacity-50">Previous</button>
+        <span class="text-xs text-gray-500">Step {{ currentInstructionStep + 1 }} of {{ instructionSteps.length }}</span>
+        <button (click)="nextInstructionStep()" [disabled]="currentInstructionStep === instructionSteps.length - 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 text-xs font-semibold disabled:opacity-50">Next</button>
+      </div>
     </div>
+    
+    <!-- Info icon to reopen instructions -->
+    <button *ngIf="!showInstructions" (click)="showInstructions = true" class="absolute top-4 right-4 bg-white bg-opacity-90 rounded-full p-2 shadow-md z-50 flex items-center justify-center hover:bg-gray-100 focus:outline-none" aria-label="Show instructions">
+      <mat-icon>info</mat-icon>
+    </button>
     
     <!-- Context Menu -->
     <app-context-menu

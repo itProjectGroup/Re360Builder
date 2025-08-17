@@ -6,6 +6,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { LinkHotspotDialogComponent } from '../components/link-hotspot-dialog/link-hotspot-dialog.component';
 import { InfoHotspotDialogComponent } from '../components/info-hotspot-dialog/info-hotspot-dialog.component';
 import { MessageService } from '../services/message/message.service';
+import { ProjectDataService } from '../services/project-data.service';
+import { MatIconModule } from '@angular/material/icon';
+import * as JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+
 
 @Component({
   selector: 'app-builder-dashboard',
@@ -14,7 +19,7 @@ import { MessageService } from '../services/message/message.service';
 })
 export class BuilderDashboardComponent implements OnInit, AfterViewInit {
   panoramas: PanoramaImage[] = [];
-  selectedPanorama?: PanoramaImage;
+  selectedPanorama?: PanoramaImage; // hold ths id for currently select 360 image panorama
   @ViewChild('panoViewer') panoViewer!: ElementRef;
   viewer?: any;
   currentScene?: any;
@@ -26,14 +31,28 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
   contextMenuVisible = false;
   contextMenuX = 0;
   contextMenuY = 0;
-  clickPosition: { yaw: number, pitch: number } = { yaw: 0, pitch: 0 };
+  clickPosition: { yaw: number, pitch: number, fov: number } = { yaw: 0, pitch: 0, fov: 0 };
+
+  projectTitle: string = '';
+  editingTitle: boolean = false;
+
+  // Instruction overlay state
+  instructionSteps: string[] = [
+    'Right-click anywhere on the panorama to add hotspots.',
+    'Use the sidebar to switch between different panoramas.',
+    'Click on a hotspot to edit or delete it.',
+    'Use the Export button to save your hotspots.'
+  ];
+  currentInstructionStep: number = 0;
+  showInstructions: boolean = true;
 
   constructor(
     private panoramaService: PanoramaService,
     private cdr: ChangeDetectorRef,
     private hotspotInfoService: HotspotInfoService,
     private dialog: MatDialog,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private projectDataService: ProjectDataService
   ) {
     // Subscribe to hotspot edit and delete events
     this.hotspotInfoService.editHotspot$.subscribe(hotspot => {
@@ -50,8 +69,18 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.projectDataService.initializeProjectData();
+
+    // Subscribe to project title changes
+    this.projectDataService.projectData$.subscribe(data => {
+      this.projectTitle = data.name;
+    });
+
     this.panoramaService.panoramas$.subscribe(panoramas => {
       console.log('Received panoramas:', panoramas);
+      // for (const panorama of panoramas) {
+      //   this.projectDataService.addNewScene(panorama);
+      // }
       this.panoramas = panoramas;
       if (panoramas.length > 0) {
         if (this.viewer) {
@@ -60,8 +89,13 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
           this.pendingPanorama = panoramas[0];
         }
       }
+
       this.cdr.detectChanges();
     });
+
+    for (const panorama of this.panoramas) {
+      this.projectDataService.addNewScene(panorama);
+    }
 
     this.autorotateConfig = (Marzipano as any).autorotate({
       yawSpeed: 0.1,
@@ -136,8 +170,14 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
           tileHeight: image.height
         }]);
 
+        // Update faceSize in project data
+        if (this.selectedPanorama) {
+          this.projectDataService.updateSceneFaceSize(this.selectedPanorama.id, image.width);
+        }
+
         // Create view with initial parameters
-        const limiter = Marzipano.RectilinearView.limit.traditional(4096, 100 * Math.PI / 180);
+        const faceSize = image.width ?? 4096; // Dynamically get the width of the loaded image
+        const limiter = Marzipano.RectilinearView.limit.traditional(faceSize, 100 * Math.PI / 180);
         let viewOptions = null;
 
         // Set initial view if available
@@ -227,7 +267,8 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
       }]);
       
       // Create view with initial parameters
-      const limiter = Marzipano.RectilinearView.limit.traditional(4096, 100 * Math.PI / 180);
+      const faceSize = image.width ?? 4096; // Dynamically get the width of the loaded image
+      const limiter = Marzipano.RectilinearView.limit.traditional(faceSize, 100 * Math.PI / 180);
       
       // Set initial view based on hotspot target or panorama default
       let viewOptions = null;
@@ -311,7 +352,8 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
     const viewCoords = view.screenToCoordinates(coords);
     this.clickPosition = {
       yaw: viewCoords.yaw,
-      pitch: viewCoords.pitch
+      pitch: viewCoords.pitch,
+      fov: view.fov()
     };
     
     this.cdr.detectChanges();
@@ -330,7 +372,8 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
     const view = this.viewer.view();
     const viewPosition = {
       yaw: view.yaw(),
-      pitch: view.pitch()
+      pitch: view.pitch(),
+      fov: view.fov()
     };
     
     const dialogRef = this.dialog.open(LinkHotspotDialogComponent, {
@@ -340,6 +383,7 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
         currentPanoramaId: this.selectedPanorama.id,
         yaw: this.clickPosition.yaw,
         pitch: this.clickPosition.pitch,
+        fov: this.clickPosition.fov,
         currentView: viewPosition
       }
     });
@@ -355,6 +399,9 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
           this.currentScene, 
           (target) => this.onHotspotClick(target)
         );
+
+        //Add hotspot to export
+        this.projectDataService.setExportHotspot(this.selectedPanorama.id, result)
       }
     });
   }
@@ -362,12 +409,14 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
   // Open dialog to add info hotspot
   addInfoHotspot() {
     if (!this.selectedPanorama) return;
+
     
     const dialogRef = this.dialog.open(InfoHotspotDialogComponent, {
       width: '400px',
       data: {
         yaw: this.clickPosition.yaw,
-        pitch: this.clickPosition.pitch
+        pitch: this.clickPosition.pitch,
+        fov: this.clickPosition.fov
       }
     });
 
@@ -378,47 +427,129 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
         
         // Display it in the current scene
         this.hotspotInfoService.createInfoHotspotElement(result, this.currentScene);
+
+        //Add to export template structure
+        this.projectDataService.setExportInfospot(this.selectedPanorama.id, result);
       }
     });
   }
 
-  // Export hotspots to JSON
-  exportHotspots() {
-    const jsonData = this.hotspotInfoService.exportHotspotsData();
+  // Export hotspots to JSON in the required APP_DATA format
+  exportHotspots() : void {
+
+    // Get the current project data
+    const projectData = this.projectDataService.projectData;
+
+    const normalizeScene = (scene: any) => ({
+      id: scene.id ?? '',
+      name: scene.name ?? '',
+      faceSize: scene.faceSize ?? 1500,
+      initialViewParameters: scene.initialViewParameters ?? { yaw: 0, pitch: 0, fov: 1.5707963267948966 },
+      linkHotspots: scene.linkHotspots ?? [],
+      infoHotspots: scene.infoHotspots ?? []
+    });
+  
+    // Ensure every scene follows the defined shape
+    const scenes = (projectData.scenes || []).map(normalizeScene);
+
+    const exportData = {
+      scenes,
+      name: projectData.name ?? '',
+      settings: projectData.settings ?? {},
+    };
+
+    const dataJsContent = 'var APP_DATA = ' + JSON.stringify(exportData, null, 2) + ';\n';
+    const templateBasePath = 'assets/export-templates';
+    const zip = new JSZip();
     
+    fetch(`${templateBasePath}/file-list.json`)
+    .then(res => res.json())
+    .then(filesList => {
+      // Fetch all template files as before
+      return Promise.all(
+        filesList.map(async (path: string) => {
+          const res = await fetch(`${templateBasePath}/${path}`);
+          if (!res.ok) throw new Error(`Failed to load ${path}`);
+          let content: Blob | string;
+          if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+            content = await res.blob();
+          } else {
+            content = await res.text();
+          }
+          return { path, content };
+        })
+      );
+    })
+    .then(async files => {
+      // Add template files to zip
+      files.forEach(({ path, content }) => {
+        if (path === 'data.js') {
+          zip.file(path, dataJsContent); // replace with generated file
+        } else {
+          zip.file(path, content);
+        }
+      });
+
+      // Add panorama images to useruploads folder in zip
+      const panoramaBlobs = await Promise.all(
+        this.panoramas.map(async pano => {
+          // Fetch the blob from the object URL
+          const response = await fetch(pano.url);
+          const blob = await response.blob();
+          return { name: pano.name, blob };
+        })
+      );
+      panoramaBlobs.forEach(({ name, blob }) => {
+        zip.file(`useruploads/${name}`, blob);
+      });
+
+      zip.generateAsync({ type: 'blob' }).then((blob: Blob) => {
+        saveAs(blob, 'export-templates.zip');
+      });
+    })
+    .catch(err => console.error('Error creating zip:', err));
+
+
+
     // Create a download link
-    const blob = new Blob([jsonData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'hotspots.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // const blob = new Blob([
+    //   'var APP_DATA = ',
+    //   JSON.stringify(exportData, null, 2),
+    //   ';\n'
+    // ], { type: 'application/javascript' });
+
+
+    // const url = URL.createObjectURL(blob);
+    // const a = document.createElement('a');
+    // a.href = url;
+    // a.download = 'data.js';
+    // document.body.appendChild(a);
+    // a.click();
+    // document.body.removeChild(a);
+    // URL.revokeObjectURL(url);
   }
 
   // Import hotspots from JSON file
-  importHotspots(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
+  // importHotspots(event: any) {
+  //   const file = event.target.files[0];
+  //   if (!file) return;
     
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      try {
-        const jsonData = e.target.result;
-        this.hotspotInfoService.importHotspotsData(jsonData);
+  //   const reader = new FileReader();
+  //   reader.onload = (e: any) => {
+  //     try {
+  //       const jsonData = e.target.result;
+  //       this.hotspotInfoService.importHotspotsData(jsonData);
         
-        // Reload hotspots for the current scene
-        if (this.selectedPanorama) {
-          this.loadHotspotsForScene(this.selectedPanorama.id);
-        }
-      } catch (error) {
-        console.error('Error importing hotspots:', error);
-      }
-    };
-    reader.readAsText(file);
-  }
+  //       // Reload hotspots for the current scene
+  //       if (this.selectedPanorama) {
+  //         this.loadHotspotsForScene(this.selectedPanorama.id);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error importing hotspots:', error);
+  //     }
+  //   };
+  //   reader.readAsText(file);
+  // }
 
   trackByFn(index: number, item: PanoramaImage) {
     return item.id;
@@ -445,8 +576,10 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
 
     if (this.autorotate) {
       this.viewer.startMovement(this.autorotateConfig); 
+      this.projectDataService.setAutorotateEnabled(Number(this.selectedPanorama?.id), true);
     } else {
       this.viewer.stopMovement();
+      this.projectDataService.setAutorotateEnabled(Number(this.selectedPanorama?.id), false);
     }
   }
 
@@ -495,6 +628,7 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
       data: {
         yaw: hotspot.yaw,
         pitch: hotspot.pitch,
+        // fov: hotspot.fov,
         hotspot: hotspot // Pass existing hotspot
       }
     });
@@ -544,13 +678,37 @@ export class BuilderDashboardComponent implements OnInit, AfterViewInit {
     const view = this.currentScene.view();
     const initialView = {
       yaw: view.yaw(),
-      pitch: view.pitch()
+      pitch: view.pitch(),
+      fov: view.fov()
     };
     
+    this.projectDataService.setInitialView(this.selectedPanorama.id, initialView);
+
     // Save this as the initial view for this panorama
     this.panoramaService.setInitialViewForPanorama(this.selectedPanorama.id, initialView);
     
     // Show message using the message service instead of alert
     this.messageService.success(`Initial view set for ${this.selectedPanorama.name}`);
+  }
+
+  saveProjectTitle() {
+    this.editingTitle = false;
+    this.projectDataService.setName(this.projectTitle);
+  }
+
+  nextInstructionStep() {
+    if (this.currentInstructionStep < this.instructionSteps.length - 1) {
+      this.currentInstructionStep++;
+    }
+  }
+
+  prevInstructionStep() {
+    if (this.currentInstructionStep > 0) {
+      this.currentInstructionStep--;
+    }
+  }
+
+  closeInstructions() {
+    this.showInstructions = false;
   }
 }

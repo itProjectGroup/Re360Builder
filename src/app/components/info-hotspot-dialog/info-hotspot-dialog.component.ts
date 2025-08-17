@@ -47,7 +47,8 @@ export class InfoHotspotDialogComponent implements OnInit {
       yaw: this.data.yaw,
       pitch: this.data.pitch,
       title: this.title,
-      text: this.text
+      text: this.text,
+      //rotation: 0
     };
     
     this.dialogRef.close(hotspot);

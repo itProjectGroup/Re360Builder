@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
-export interface Hotspot {
+export interface Hotspot {  // change to extended class and differentiate Info and Link
   id: string;
   type: 'link' | 'info';
   yaw: number;
@@ -13,7 +13,10 @@ export interface Hotspot {
   };
   title?: string;  // For info hotspots
   text?: string;   // For info hotspots
+  rotation?: number;
 }
+
+
 
 export interface SceneHotspots {
   sceneId: string;
